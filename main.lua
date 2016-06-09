@@ -1,10 +1,45 @@
-------------------------------------------------
--- Modules
-------------------------------------------------
+function love.run()
 
-------------------------------------------------
--- Base functions
-------------------------------------------------
+	if love.math then
+		love.math.setRandomSeed(os.time())
+	end
+
+	if love.load then love.load() end
+
+	-- We don't want the first frame's dt to include time taken by love.load.
+	if love.timer then love.timer.step() end
+	-- Main loop time.
+	while true do
+		-- Process events.
+		if love.event then
+			love.event.pump()
+			for name, a,b,c,d,e,f in love.event.poll() do
+				if name == "quit" then
+					if not love.quit or not love.quit() then
+						return a
+					end
+				end
+				love.handlers[name](a,b,c,d,e,f)
+			end
+		end
+		-- Call update and draw
+		if love.update then love.update() end -- will pass 0 if love.timer is disabled
+
+		if love.graphics and love.graphics.isActive() then
+			love.graphics.clear(love.graphics.getBackgroundColor())
+			love.graphics.origin()
+			if love.draw then love.draw() end
+			love.graphics.present()
+		end
+
+		if love.timer then
+      love.timer.sleep(0.001)
+      love.timer.step()
+    end
+	end
+
+end
+
 function love.load()
     bunnies = {}
     gravity = 0.98
@@ -18,28 +53,21 @@ function love.load()
     litterSizeIncrement = 500
     litterSize = baseLitterSize
 
-    stdOutText = ""
-
     bunnyCount = 0
-
+    --Let's load our bunny texture and create a spriteBatch to render with later
     bunnyImg = love.graphics.newImage("bunny.png")
     bunnyBatch = love.graphics.newSpriteBatch(bunnyImg, 1000000)
 end
 
 function love.draw()
---[[Old code
-    for i=1,#bunnies do
-        love.graphics.draw(bunnyImg, bunnies[i].x, bunnies[i].y)
-    end
---New code]]--
+    --Render the bunnies
     bunnyBatch:clear()
     for i=1,#bunnies do
         bunnyBatch:add(bunnies[i].x,bunnies[i].y)
     end
     bunnyBatch:flush()
-    
     love.graphics.draw(bunnyBatch)
-
+    --Print some useful information (We print this afterwards so it's on top of the bunnies and doesnt get lost)
     love.graphics.print(bunnyCount .. " Total Bunnies", 20, 10)
 
     love.graphics.print(litterSize .. " bunnies in each Litter", 20, 20)
@@ -48,7 +76,7 @@ function love.draw()
 
 end
 
-function love.mousepressed(x, y, button, istouch)
+function love.mousepressed(x, y, button)--We need to create some bunnies when the primary mousebutton is pressed
   if button == 1 then
     for variable = 1, litterSize do
       procreate(x, y)
@@ -56,7 +84,13 @@ function love.mousepressed(x, y, button, istouch)
   end
 end
 
-function love.wheelmoved(x, y)
+function  love.keyreleased(key)--Quit the game if escape is released
+  if(key == "escape") then
+    love.event.push('quit')
+  end
+end
+
+function love.wheelmoved(x, y)--We want to be able to change how many bunnies are created per mousebutton press
   if y > 0 then --the mousewheel was moved up
       litterSize = litterSize + litterSizeIncrement
   elseif y < 0 then --the mousewheel was moved down
@@ -66,7 +100,9 @@ function love.wheelmoved(x, y)
   end
 end
 
-function love.update(dt)
+function love.update()
+    --Let's move our bunnies around
+
 
     for i=1,#bunnies do
         bunnies[i].x = bunnies[i].x + bunnies[i].sx;
@@ -90,63 +126,12 @@ function love.update(dt)
         end
     end
 end
+
 function love.quit()
-    stdOutPrint("Quitting app!")
+    print("Quitting app!")
 end
-------------------------------------------------
--- Custom functions
-------------------------------------------------
 
 function procreate(argx,argy) -- this function creates a new bunny
     bunnyCount = bunnyCount + 1
-    table.insert(bunnies, {id = bunnyCount, x=argx, y=argy, sx=(math.random() * 10) - 5, sy=(math.random() * 10) - 5 })
-end
-
-------------------------------------------------
--- Utils. Toolbelt stuff needed to run this app
-------------------------------------------------
-
-------------------------------------------------
--- Debug. Stuff here gets removed after debugging is done
-------------------------------------------------
-
-function stdOutPrint(text)
-    stdOutText = text
-    print(text)
-end
-
-function table.val_to_str ( v )
-  if "string" == type( v ) then
-    v = string.gsub( v, "\n", "\\n" )
-    if string.match( string.gsub(v,"[^'\"]",""), '^"+$' ) then
-      return "'" .. v .. "'"
-    end
-    return '"' .. string.gsub(v,'"', '\\"' ) .. '"'
-  else
-    return "table" == type( v ) and table.tostring( v ) or
-      tostring( v )
-  end
-end
-
-function table.key_to_str ( k )
-  if "string" == type( k ) and string.match( k, "^[_%a][_%a%d]*$" ) then
-    return k
-  else
-    return "[" .. table.val_to_str( k ) .. "]"
-  end
-end
-
-function table.tostring( tbl )
-  local result, done = {}, {}
-  for k, v in ipairs( tbl ) do
-    table.insert( result, table.val_to_str( v ) )
-    done[ k ] = true
-  end
-  for k, v in pairs( tbl ) do
-    if not done[ k ] then
-      table.insert( result,
-        table.key_to_str( k ) .. "=" .. table.val_to_str( v ) )
-    end
-  end
-  return "{" .. table.concat( result, "," ) .. "}"
+    table.insert(bunnies, {x=argx, y=argy, sx=(math.random(0,10)) - 5, sy=(math.random(0,10)) - 5 })
 end
