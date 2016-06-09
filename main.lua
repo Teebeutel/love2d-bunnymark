@@ -11,31 +11,29 @@ function love.run()
 	-- Main loop time.
 	while true do
 		-- Process events.
-		if love.event then
-			love.event.pump()
-			for name, a,b,c,d,e,f in love.event.poll() do
-				if name == "quit" then
-					if not love.quit or not love.quit() then
-						return a
-					end
+
+		love.event.pump()
+		for name, a,b,c,d,e,f in love.event.poll() do
+			if name == "quit" then
+				if not love.quit or not love.quit() then
+					return a
 				end
-				love.handlers[name](a,b,c,d,e,f)
 			end
+			love.handlers[name](a,b,c,d,e,f)
 		end
+
 		-- Call update and draw
 		love.update()
-
-		if love.graphics and love.graphics.isActive() then
+		if love.graphics.isActive() then
 			love.graphics.clear(love.graphics.getBackgroundColor())
 			love.graphics.origin()
 			love.draw()
 			love.graphics.present()
 		end
 
-		if love.timer then
-      love.timer.sleep(0.001)
-      love.timer.step()
-    end
+    love.timer.sleep(0.001)
+    love.timer.step()
+
 	end
 
 end
