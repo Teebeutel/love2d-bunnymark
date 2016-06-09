@@ -14,8 +14,8 @@ function love.load()
     maxY = love.graphics.getHeight( )
     minY = 0
 
-    baseLitterSize = 1000
-    litterSizeIncrement = 1000
+    baseLitterSize = 500
+    litterSizeIncrement = 500
     litterSize = baseLitterSize
 
     stdOutText = ""
@@ -23,19 +23,28 @@ function love.load()
     bunnyCount = 0
 
     bunnyImg = love.graphics.newImage("bunny.png")
+    bunnyBatch = love.graphics.newSpriteBatch(bunnyImg, 1000000)
 end
 
 function love.draw()
+--[[Old code
+    for i=1,#bunnies do
+        love.graphics.draw(bunnyImg, bunnies[i].x, bunnies[i].y)
+    end
+--New code]]--
+    bunnyBatch:clear()
+    for i=1,#bunnies do
+        bunnyBatch:add(bunnies[i].x,bunnies[i].y)
+    end
+    bunnyBatch:flush()
+    
+    love.graphics.draw(bunnyBatch)
 
     love.graphics.print(bunnyCount .. " Total Bunnies", 20, 10)
 
     love.graphics.print(litterSize .. " bunnies in each Litter", 20, 20)
 
     love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 20, 30)
-
-    for index,value in ipairs(bunnies) do
-        love.graphics.draw(bunnyImg, value.x, value.y)
-    end
 
 end
 
@@ -50,7 +59,7 @@ end
 function love.wheelmoved(x, y)
   if y > 0 then --the mousewheel was moved up
       litterSize = litterSize + litterSizeIncrement
-  elseif y<0 then --the mousewheel was moved down
+  elseif y < 0 then --the mousewheel was moved down
       if litterSize > baseLitterSize then
           litterSize = litterSize - litterSizeIncrement
       end
