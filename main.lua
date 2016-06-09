@@ -23,12 +23,12 @@ function love.run()
 			end
 		end
 		-- Call update and draw
-		if love.update then love.update() end -- will pass 0 if love.timer is disabled
+		love.update()
 
 		if love.graphics and love.graphics.isActive() then
 			love.graphics.clear(love.graphics.getBackgroundColor())
 			love.graphics.origin()
-			if love.draw then love.draw() end
+			love.draw()
 			love.graphics.present()
 		end
 
