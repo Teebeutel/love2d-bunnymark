@@ -1,11 +1,42 @@
 function love.run()
 
-	if love.math then
-		love.math.setRandomSeed(os.time())
-	end
+	math.randomseed(os.time())
 
 	love.load()
 	-- Main loop time.
+	fps = {}
+	results={}
+	for numBunnies=1,10 do
+		fps[numBunnies] = {}
+		for variable = 1, numBunnies*10*litterSize do
+      procreate(10, 10)
+    end
+		love.timer.step()--Let's make sure to advance the timer so we dont get a time from our last result
+		for tick=1,1000 do
+			-- Process events.
+			love.event.pump()
+			for name, a,b,c,d,e,f in love.event.poll() do
+				if name == "quit" then
+					if not love.quit or not love.quit() then
+						return a
+					end
+				end
+				love.handlers[name](a,b,c,d,e,f)
+			end
+
+			-- Call update and draw
+			love.update()
+			love.graphics.clear(0,0,0)
+			love.draw()
+			love.graphics.present()
+			fps[numBunnies][tick] = love.timer.getFPS( )
+    	love.timer.step()
+
+		end
+		bunnies = {}
+		bunnycount = 0
+		calculateresult()
+	end
 	while true do
 		-- Process events.
 		love.event.pump()
@@ -21,13 +52,12 @@ function love.run()
 		-- Call update and draw
 		love.update()
 		love.graphics.clear(0,0,0)
-		love.draw()
+		calculateresult()
+		drawresult()
 		love.graphics.present()
 
-    love.timer.step()
-
+		love.timer.step()
 	end
-
 end
 
 function love.load()
@@ -43,8 +73,8 @@ function love.load()
     maxY = love.graphics.getHeight( ) - bunnyImg:getHeight()
     minY = 0
 
-    baseLitterSize = 500
-    litterSizeIncrement = 500
+    baseLitterSize = 1000
+    litterSizeIncrement = 1000
     litterSize = baseLitterSize
 
     bunnyCount = 0
@@ -58,14 +88,26 @@ function love.draw()
     end
     bunnyBatch:flush()
     love.graphics.draw(bunnyBatch)
-    --Print some useful information (We print this afterwards so it's on top of the bunnies and doesnt get lost)
-    love.graphics.print(bunnyCount .. " Total Bunnies", 20, 10)
+		drawresult()
+end
 
-    love.graphics.print(litterSize .. " bunnies in each Litter", 20, 20)
+function calculateresult()
+	for k,v in ipairs(fps) do
+		if not results[k] then
+			results[k]=0
+			for k1,v1 in ipairs(v) do
+				results[k]=results[k]+v1
+			end
+			results[k]=results[k]/#v
+		end
+	end
+end
 
-    love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 20, 30)
-
-		love.graphics.print("Current Frametime: "..tostring(love.timer.getDelta( )), 20, 40)
+function drawresult()
+    --Let's print the result of our benchmark
+		for i = 1,#results do
+			love.graphics.print("Average FPS with "..i*10*litterSize.." Bunnies: " .. results[i], 20, 10*i)
+		end
 
 end
 
