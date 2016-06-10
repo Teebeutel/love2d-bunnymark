@@ -4,14 +4,10 @@ function love.run()
 		love.math.setRandomSeed(os.time())
 	end
 
-	if love.load then love.load() end
-
-	-- We don't want the first frame's dt to include time taken by love.load.
-	if love.timer then love.timer.step() end
+	love.load()
 	-- Main loop time.
 	while true do
 		-- Process events.
-
 		love.event.pump()
 		for name, a,b,c,d,e,f in love.event.poll() do
 			if name == "quit" then
@@ -24,14 +20,11 @@ function love.run()
 
 		-- Call update and draw
 		love.update()
-		if love.graphics.isActive() then
-			love.graphics.clear(love.graphics.getBackgroundColor())
-			love.graphics.origin()
-			love.draw()
-			love.graphics.present()
-		end
+		love.graphics.clear(0,0,0)
+		love.draw()
+		love.graphics.present()
 
-    love.timer.sleep(0.001)
+
     love.timer.step()
 
 	end
@@ -39,12 +32,16 @@ function love.run()
 end
 
 function love.load()
+		--Let's load our texture and create a spritebatch to render with later
+		bunnyImg = love.graphics.newImage("bunny.png")
+		bunnyBatch = love.graphics.newSpriteBatch(bunnyImg, 1000000)
+
     bunnies = {}
     gravity = 0.98
 
-    maxX = love.graphics.getWidth( )
+    maxX = love.graphics.getWidth( ) - bunnyImg:getWidth()
     minX = 0
-    maxY = love.graphics.getHeight( )
+    maxY = love.graphics.getHeight( ) - bunnyImg:getHeight()
     minY = 0
 
     baseLitterSize = 500
@@ -52,9 +49,6 @@ function love.load()
     litterSize = baseLitterSize
 
     bunnyCount = 0
-    --Let's load our bunny texture and create a spriteBatch to render with later
-    bunnyImg = love.graphics.newImage("bunny.png")
-    bunnyBatch = love.graphics.newSpriteBatch(bunnyImg, 1000000)
 end
 
 function love.draw()
@@ -71,6 +65,8 @@ function love.draw()
     love.graphics.print(litterSize .. " bunnies in each Litter", 20, 20)
 
     love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 20, 30)
+
+		love.graphics.print("Current Frametime: "..tostring(love.timer.getDelta( )), 20, 40)
 
 end
 
