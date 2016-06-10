@@ -24,7 +24,6 @@ function love.run()
 		love.draw()
 		love.graphics.present()
 
-
     love.timer.step()
 
 	end
@@ -127,5 +126,11 @@ end
 
 function procreate(argx,argy) -- this function creates a new bunny
     bunnyCount = bunnyCount + 1
-    table.insert(bunnies, {x=argx, y=argy, sx=(math.random(0,10)) - 5, sy=(math.random(0,10)) - 5 })
+		--Make sure our new bunny doesnt get stuck outside the bounds
+		argx = math.max(argx, 10)
+		argy = math.max(argy, 10)
+		argx = math.min(argx,maxX-10)
+		argy = math.min(argy,maxY-10)
+		--Add our new bunny
+    table.insert(bunnies, {x=argx, y=argy, sx=(math.random(0,100)/10) - 5, sy=(math.random(0,100)/10) - 5 })
 end
