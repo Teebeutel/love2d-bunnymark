@@ -37,6 +37,7 @@ function love.run()
 		bunnycount = 0
 		calculateresult()
 	end
+	done=true
 	while true do
 		-- Process events.
 		love.event.pump()
@@ -112,7 +113,7 @@ function drawresult()
 end
 
 function love.mousepressed(x, y, button)--We need to create some bunnies when the primary mousebutton is pressed
-  if button == 1 then
+  if button == 1 and done then --Make sure the user cant interfere with the automated benchmarking process
     for variable = 1, litterSize do
       procreate(x, y)
     end
