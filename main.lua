@@ -34,6 +34,7 @@ function love.run()
 
 		end
 		bunnies = {}
+		bunnyBatch:clear()
 		bunnycount = 0
 		calculateresult()
 	end
@@ -83,9 +84,8 @@ end
 
 function love.draw()
     --Render the bunnies
-    bunnyBatch:clear()
-    for i=1,#bunnies do
-        bunnyBatch:add(bunnies[i].x,bunnies[i].y)
+        for i=1,#bunnies do
+        bunnyBatch:set(bunnies[i].id,bunnies[i].x,bunnies[i].y)
     end
     bunnyBatch:flush()
     love.graphics.draw(bunnyBatch)
@@ -175,5 +175,5 @@ function procreate(argx,argy) -- this function creates a new bunny
 		argx = math.min(argx,maxX-10)
 		argy = math.min(argy,maxY-10)
 		--Add our new bunny
-    table.insert(bunnies, {x=argx, y=argy, sx=(math.random(0,100)/10) - 5, sy=(math.random(0,100)/10) - 5 })
+    table.insert(bunnies, {x=argx, y=argy, sx=(math.random(0,100)/10) - 5, sy=(math.random(0,100)/10) - 5, id = bunnyBatch:add(argx,argy)})
 end
