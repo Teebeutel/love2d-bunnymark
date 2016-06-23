@@ -9,7 +9,9 @@ This is basically a port of the script written by the PixiJS guys.
 
 Controls
 ================
-Left Clicking the mouse anywhere on the screen spawns a litter of bunnies (minimum 1000). The number of generated sprites can be increased or decreased by using the mousewheel.
+The benchmark runs ten sets of i*10000 bunnies for 1000 frames each and calculates the average framerate, displaying it after each test
+
+After the automatic benchmark is finished, left clicking the mouse anywhere on the screen spawns a litter of bunnies (minimum 1000). The number of generated sprites can be increased or decreased by using the mousewheel.
 
 Credits
 ================

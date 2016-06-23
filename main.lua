@@ -127,6 +127,7 @@ function  love.keyreleased(key)--Quit the game if escape is released
 end
 
 function love.wheelmoved(x, y)--We want to be able to change how many bunnies are created per mousebutton press
+	if not done then return end
   if y > 0 then --the mousewheel was moved up
       litterSize = litterSize + litterSizeIncrement
   elseif y < 0 then --the mousewheel was moved down
